@@ -1,9 +1,10 @@
 package sp.lab;
 
-public class Paragraph implements Element {
+public class Paragraph extends Element {
     private final String text;
 
     public Paragraph(String text) {
+        super();
         this.text = text;
     }
 

@@ -1,9 +1,10 @@
 package sp.lab;
 
-public class Image implements Element {
+public class Image extends Element {
     private final String imageName;
 
     public Image(String imageName) {
+        super();
         this.imageName = imageName;
     }
 

@@ -3,11 +3,12 @@ package sp.lab;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Section implements Element {
+public class Section extends Element {
     protected String name;
     protected List<Element> children = new ArrayList<>();
 
     public Section(String name) {
+        super();
         this.name = name;
     }
 
@@ -17,7 +18,16 @@ public class Section implements Element {
 
     @Override
     public void add(Element e) {
-        children.add(e);
+        // Enforce composition: disallow sharing (an element can only have one parent)
+        if (e.getParent() != null && e.getParent() != this) {
+            throw new IllegalArgumentException(
+                "Element already belongs to another section. Cannot add element to multiple parents."
+            );
+        }
+        if (!children.contains(e)) {
+            children.add(e);
+            e.setParent(this);
+        }
     }
 
     @Override
