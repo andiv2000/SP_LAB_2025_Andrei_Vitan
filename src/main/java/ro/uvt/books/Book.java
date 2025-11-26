@@ -1,17 +1,29 @@
 package ro.uvt.books;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "books")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id"))
+    @Column(name = "author")
     private List<String> authors = new ArrayList<>();
 
     public Book() {}
 
-    public Book(Long id, String title) {
-        this.id = id;
+    public Book(String title) {
         this.title = title;
     }
 

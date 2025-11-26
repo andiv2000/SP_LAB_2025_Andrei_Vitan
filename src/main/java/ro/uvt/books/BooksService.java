@@ -1,46 +1,52 @@
 package ro.uvt.books;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
+@Service
 public class BooksService {
-    private final Map<Long, Book> storage = new HashMap<>();
-    private final AtomicLong idGen = new AtomicLong(1);
+    private final BooksRepository repository;
 
-    public BooksService() {
-        // preload with sample
-        Book b = new Book(idGen.getAndIncrement(), "Noapte buna, copii!");
-        b.getAuthors().add("Radu Pavel Gheo");
-        storage.put(b.getId(), b);
+    public BooksService(BooksRepository repository) {
+        this.repository = repository;
+    }
+
+    @PostConstruct
+    public void init() {
+        if (repository.count() == 0) {
+            Book b = new Book("Noapte buna, copii!");
+            b.getAuthors().add("Radu Pavel Gheo");
+            repository.save(b);
+        }
     }
 
     public List<Book> findAll() {
-        return new ArrayList<>(storage.values());
+        return repository.findAll();
     }
 
     public Optional<Book> findById(Long id) {
-        return Optional.ofNullable(storage.get(id));
+        return repository.findById(id);
     }
 
     public Book create(Book b) {
-        Long id = idGen.getAndIncrement();
-        b.setId(id);
-        storage.put(id, b);
-        return b;
+        b.setId(null);
+        return repository.save(b);
     }
 
     public Optional<Book> update(Long id, Book b) {
-        if (!storage.containsKey(id)) return Optional.empty();
-        b.setId(id);
-        storage.put(id, b);
-        return Optional.of(b);
+        return repository.findById(id).map(existing -> {
+            existing.setTitle(b.getTitle());
+            existing.setAuthors(b.getAuthors());
+            return repository.save(existing);
+        });
     }
 
     public boolean delete(Long id) {
-        return storage.remove(id) != null;
+        if (!repository.existsById(id)) return false;
+        repository.deleteById(id);
+        return true;
     }
 }
