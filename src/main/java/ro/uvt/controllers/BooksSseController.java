@@ -20,7 +20,12 @@ public class BooksSseController {
     @RequestMapping("/books-sse")
     public SseEmitter getBooksSse() {
         final SseEmitter emitter = new SseEmitter(0L);
-        allBooksSubject.attach(new SseObserver(emitter));
+        final ro.uvt.observer.SseObserver obs = new ro.uvt.observer.SseObserver(emitter);
+        allBooksSubject.attach(obs);
+        // detach observer on completion/timeout/error to avoid memory leaks
+        emitter.onCompletion(() -> allBooksSubject.detach(obs));
+        emitter.onTimeout(() -> allBooksSubject.detach(obs));
+        emitter.onError((ex) -> allBooksSubject.detach(obs));
         return emitter;
     }
 }
