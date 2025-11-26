@@ -5,13 +5,16 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
+import ro.uvt.observer.AllBooksSubject;
 
 @Service
 public class BooksService {
     private final BooksRepository repository;
+    private final AllBooksSubject allBooksSubject;
 
-    public BooksService(BooksRepository repository) {
+    public BooksService(BooksRepository repository, AllBooksSubject allBooksSubject) {
         this.repository = repository;
+        this.allBooksSubject = allBooksSubject;
     }
 
     @PostConstruct
@@ -33,14 +36,22 @@ public class BooksService {
 
     public Book create(Book b) {
         b.setId(null);
-        return repository.save(b);
+        Book saved = repository.save(b);
+        try {
+            allBooksSubject.add(saved);
+        } catch (Exception ignored) {}
+        return saved;
     }
 
     public Optional<Book> update(Long id, Book b) {
         return repository.findById(id).map(existing -> {
             existing.setTitle(b.getTitle());
             existing.setAuthors(b.getAuthors());
-            return repository.save(existing);
+            Book saved = repository.save(existing);
+            try {
+                allBooksSubject.add(saved);
+            } catch (Exception ignored) {}
+            return saved;
         });
     }
 
