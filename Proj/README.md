@@ -204,7 +204,3 @@ Configurări în `application.properties`:
 ## Autor
 
 Andrei Vitan
-
-## Licență
-
-Acest proiect este parte din cursul de Design Patterns la UVT.
