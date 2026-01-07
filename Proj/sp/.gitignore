@@ -1,0 +1,12 @@
+# Maven / IntelliJ / build artifacts
+/target/
+/.idea/
+/*.iml
+
+# IDE output
+/out/
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
